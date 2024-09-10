@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { OrbitControls } from "jsm/controls/OrbitControls.js";
 
 const w = window.innerWidth;
 const h = window.innerHeight;
@@ -15,11 +16,35 @@ camera.position.z = 2;
 
 const scene = new THREE.Scene();
 
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.3;
+
 const geo = new THREE.IcosahedronGeometry(1.0,2);
 const mat = new THREE.MeshBasicMaterial({
-    color:0xccff
+    color:0xFFFFFF,
+    flatShading: true
 });
 const mesh = new THREE.Mesh(geo,mat);
 scene.add(mesh);
+
+const wireMat = new THREE.MeshBasicMaterial({
+    color: 0xFFFFFF,
+    wireframe: true
+})
+
+const wireMesh = new THREE.Mesh(geo,wireMat);
+wireMesh.scale.setScalar(1.001);
+mesh.add(wireMesh)
+
+const hemiLight = new THREE.HemisphereLight(0x0099FF, 0xaa5500);
+scene.add(hemiLight);
+
+function animate(t=0) {
+    requestAnimationFrame(animate);
+    mesh.scale.setScalar(Math.cos(t * 0.001) +1.0);
+    renderer.render(scene, camera);
+    controls.update();
+}
 
 renderer.render(scene,camera);
